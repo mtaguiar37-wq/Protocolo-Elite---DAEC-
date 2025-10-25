@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Protocolo DAEC — Operação Pipa Combate</title>
+<style>
+  /* layout geral */
+  :root{
+    --green:#b7e100;
+    --bg:#05060a;
+    --muted:#9ca3af;
+    --glass: rgba(0,0,0,0.55);
+  }
+  html,body{height:100%;margin:0;background:var(--bg);font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace;color:var(--green);}
+  .wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:28px;box-sizing:border-box;}
+  .screen{
+    width:100%;max-width:980px;border-radius:10px;padding:28px;background:linear-gradient(180deg, rgba(0,0,0,0.65), rgba(0,0,0,0.75));
+    box-shadow:0 10px 40px rgba(0,0,0,0.6);position:relative;overflow:hidden;border:1px solid rgba(183,225,0,0.06);
+  }
+
+  /* background logo (big, centered, subtle) */
+  .screen::before{
+    content:"";
+    position:absolute; inset:0;
+    background-image: url('/mnt/data/558a7583-0836-4261-a4bb-faf3c56761ec.png');
+    background-repeat:no-repeat;
+    background-position:center center;
+    background-size:55%;
+    opacity:0.06;
+    pointer-events:none;
+    mix-blend-mode:screen;
+  }
+
+  /* header small logo */
+  .header{display:flex;align-items:center;gap:14px;margin-bottom:18px;z-index:2;position:relative}
+  .logo{width:84px;height:84px;border-radius:8px;overflow:hidden;background:var(--glass);display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.03)}
+  .logo img{max-width:76px;max-height:76px;display:block}
+  .title{font-size:18px;color:var(--green);line-height:1;font-weight:700}
+  .subtitle{color:var(--muted);font-size:12px;margin-top:6px}
+
+  /* main terminal text */
+  .terminal{font-size:36px;line-height:1.05;letter-spacing:2px;white-space:pre-wrap;z-index:2;position:relative}
+  .small{font-size:14px;color:var(--muted);letter-spacing:1px;margin-top:10px}
+
+  /* status row */
+  .status{display:flex;gap:14px;margin-top:18px;flex-wrap:wrap;z-index:2}
+  .chip{padding:8px 12px;border-radius:8px;background:rgba(0,0,0,0.35);color:var(--green);font-weight:700;border:1px solid rgba(183,225,0,0.08)}
+
+  /* details panel like the source */
+  .panel{margin-top:22px;background:rgba(0,0,0,0.45);padding:14px;border-radius:8px;border:1px solid rgba(255,255,255,0.02);z-index:2}
+
+  /* lists */
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .block{padding:10px;border-radius:6px;background:linear-gradient(180deg, rgba(0,0,0,0.18), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.02)}
+  .block h4{margin:0 0 8px 0;color:var(--green);font-size:13px}
+  .block ul{margin:0;padding-left:18px;color:#e6f2a6}
+  .block li{margin:6px 0;font-size:13px}
+
+  /* typing cursor animation */
+  .typing{display:inline-block;overflow:hidden;vertical-align:bottom}
+  .cursor{display:inline-block;width:10px;height:1.1em;background:var(--green);margin-left:6px;animation:blink 1s steps(2,start) infinite}
+  @keyframes blink{50%{opacity:0}}
+
+  /* mimic typed lines (delays set inline via CSS variables) */
+  .line{opacity:0}
+  .line.show{opacity:1;animation:fadeIn 0.4s linear forwards}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+  /* responsive */
+  @media(max-width:780px){
+    .terminal{font-size:24px}
+    .cols{grid-template-columns:1fr}
+    .logo{width:64px;height:64px}
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="screen" role="main" aria-label="Protocolo DAEC">
+      <div class="header" aria-hidden="false">
+        <div class="logo"><img src="/mnt/data/558a7583-0836-4261-a4bb-faf3c56761ec.png" alt="logo DAEC"></div>
+        <div>
+          <div class="title">POLÍCIA MILITAR DA CAPITAL — UNIDADE DAEC • PROTOCOLO DE ACOMPANHAMENTO</div>
+          <div class="subtitle">RASTREAMENTO ATIVO — Operação Pipa Combate</div>
+        </div>
+      </div>
+
+      <div class="terminal" id="terminal">
+        <div class="line" id="l1">INICIANDO PROTOCOLO DAEC</div>
+        <div class="line" id="l2">ALTITUDE &gt; 10.000 PÉS</div>
+        <div class="line" id="l3">RÁDIO &gt; POLICIAELT</div>
+        <div class="line" id="l4">PROTOCOLO &gt; Elite</div>
+        <div class="line" id="l5">OPERAÇÃO &gt; Pipa Combate</div>
+        <div class="line" id="l6">STATUS &gt; PROTOCOLO DAEC ATIVO ✅</div>
+        <span class="cursor" id="cursor"></span>
+      </div>
+
+      <div class="status" role="status" aria-live="polite">
+        <div class="chip">Velocidade: —</div>
+        <div class="chip">Altitude: 10.000 pés</div>
+        <div class="chip">Rádio: POLICIAELT</div>
+        <div class="chip">Protocolo: Elite</div>
+      </div>
+
+      <div class="panel" aria-label="Convocados">
+        <div class="cols">
+          <div class="block">
+            <h4>Gestão / Supervisão</h4>
+            <ul>
+              <li><strong>Gestor:</strong> 2° Sargento Becker (01)</li>
+              <li><strong>Subgestor:</strong> 2° Sargento Madela (02)</li>
+              <li><strong>Supervisores:</strong> Cb 1° Veio; Cb 1° Dias; Sd 1° Zezin</li>
+            </ul>
+          </div>
+
+          <div class="block">
+            <h4>Pilotos & Atiradores</h4>
+            <ul>
+              <li><strong>Pilotos Elite:</strong> Sd. 1° Gb; Sd. 1° Liam; Cb. 1° Pereira; Sd. 1° Mesquita</li>
+              <li><strong>Atiradores de Elite:</strong> 3° Sgt Sartori; Cb. 2° Jeff; Cb. 1° Kaua; Sd. 1° Tadashi; Sd. 2° Dimitrty; Sd. 2° Guilherme</li>
+            </ul>
+          </div>
+
+          <div class="block">
+            <h4>Pilotos Probatórios</h4>
+            <ul>
+              <li>Sd. 1° Ryan de Chavas; Sd. 2° Matheus; Sd. 2° Dan; Sd. 2° Bryan; Sd. 2° Dexter; Sd. 2° Benner; Sd. 2° Vitor Leal; Sd. 2° Armando; Sd. 2° Gonzaga</li>
+            </ul>
+          </div>
+
+          <div class="block">
+            <h4>Atiradores Probatórios</h4>
+            <ul>
+              <li>Sd. 1° Korleone; Sd. 1° Luckzyn; Sd. 1° Riq Santos; Cb. 1° Sena</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div style="height:8px"></div>
+      <div style="color:var(--muted);font-size:12px;z-index:2">Documento: Convocação DAEC — Não compartilhar com não autorizados</div>
+    </div>
+  </div>
+
+<script>
+  // Typing-style reveal for lines (imitates the source behavior)
+  const lines = [
+    {id:'l1', delay:300},
+    {id:'l2', delay:900},
+    {id:'l3', delay:1300},
+    {id:'l4', delay:1700},
+    {id:'l5', delay:2100},
+    {id:'l6', delay:2500}
+  ];
+
+  // reveal each line in sequence
+  lines.forEach((ln, idx) => {
+    setTimeout(()=> {
+      const el = document.getElementById(ln.id);
+      if(el){ el.classList.add('show'); }
+      // after last line hide cursor slowly
+      if(idx === lines.length-1){
+        setTimeout(()=>document.getElementById('cursor').style.opacity = '0', 1400);
+      }
+    }, ln.delay);
+  });
+
+  // simple accessibility: focus terminal for screen readers
+  document.getElementById('terminal').setAttribute('tabindex','0');
+</script>
+</body>
+</html>
